@@ -36,24 +36,9 @@ class EditorialCommentsApiController extends FOSRestController
             ->getAllByArticleNumber($number)->getResult();
 
         if ($order == 'nested' && $editorialComments) {
-            $root = new \Node(0,0,'');
-            $reSortedComments = array();
-            foreach ($editorialComments as $comment) {
-                $reSortedComments[$comment->getId()] = $comment;
-            }
-
-            ksort($reSortedComments);
-
-            foreach ($reSortedComments as $comment) {
-                if ($comment->getParent() instanceof EditorialComment) {
-                    $node = new \Node($comment->getId(), $comment->getParent()->getId(), $comment);
-                } else {
-                    $node = new \Node($comment->getId(), 0, $comment);
-                }
-                $root->insertNode($node);
-            }
-
-            $editorialComments = $root->flatten(false);
+            $nodeTree = new \NodeTree();
+            $nodeTree->build($editorialComments);
+            $editorialComments = $nodeTree->getFlattened();
         }
 
         $paginator = $this->get('newscoop.paginator.paginator_service');

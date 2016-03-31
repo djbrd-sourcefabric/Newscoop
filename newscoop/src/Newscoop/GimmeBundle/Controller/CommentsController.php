@@ -159,24 +159,9 @@ class CommentsController extends FOSRestController
             ->getResult();
 
         if ($order == 'nested' && $articleComments) {
-            $root = new \Node(0,0,''); // create a new Node, we remove this one later, but we need a Root Node.
-
-            foreach ($articleComments as $comment) {
-                $reSortedComments[$comment->getId()] = $comment;
-            }
-
-            ksort($reSortedComments);   // sort by commentId
-
-            foreach ($reSortedComments as $comment) {
-                if ($comment->getParent() instanceof \Newscoop\Entity\Comment) {
-                    $node = new \Node($comment->getId(), $comment->getParent()->getId(), $comment);
-                } else {
-                    $node = new \Node($comment->getId(), 0, $comment);
-                }
-                $root->insertNode($node);
-            }
-
-            $articleComments = $root->flatten(false);
+            $nodeTree = new \NodeTree();
+            $nodeTree->build($articleComments);
+            $articleComments = $nodeTree->getFlattened();
         }
 
         $paginator = $this->get('newscoop.paginator.paginator_service');
