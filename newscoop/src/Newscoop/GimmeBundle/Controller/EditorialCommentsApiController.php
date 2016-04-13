@@ -4,6 +4,7 @@ namespace Newscoop\GimmeBundle\Controller;
 
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Controller\Annotations\View;
+use Newscoop\GimmeBundle\Node\NodeTree;
 use Symfony\Component\HttpFoundation\Request;
 use Newscoop\ArticlesBundle\Form\Type\EditorialCommentType;
 use Newscoop\ArticlesBundle\Entity\EditorialComment;
@@ -36,7 +37,7 @@ class EditorialCommentsApiController extends FOSRestController
             ->getAllByArticleNumber($number)->getResult();
 
         if ($order == 'nested' && $editorialComments) {
-            $nodeTree = new \NodeTree();
+            $nodeTree = new NodeTree();
             $nodeTree->build($editorialComments);
             $editorialComments = $nodeTree->getFlattened();
         }

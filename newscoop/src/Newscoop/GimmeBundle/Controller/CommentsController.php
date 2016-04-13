@@ -10,6 +10,7 @@ namespace Newscoop\GimmeBundle\Controller;
 
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Controller\Annotations\View;
+use Newscoop\GimmeBundle\Node\NodeTree;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\HttpFoundation\Request;
@@ -159,7 +160,7 @@ class CommentsController extends FOSRestController
             ->getResult();
 
         if ($order == 'nested' && $articleComments) {
-            $nodeTree = new \NodeTree();
+            $nodeTree = new NodeTree();
             $nodeTree->build($articleComments);
             $articleComments = $nodeTree->getFlattened();
         }

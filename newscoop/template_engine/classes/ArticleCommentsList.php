@@ -61,7 +61,7 @@ class ArticleCommentsList extends ListObject
         $articleCommentsList = $repository->getData($params, $cols);
         $metaCommentsList = array();
         if ($this->_nested) {
-            $nodeTree = new \NodeTree();
+            $nodeTree = new \Newscoop\GimmeBundle\Node\NodeTree();
             $nodeTree->build($articleCommentsList);
             $metaCommentsList = $nodeTree->getFlattened();
         } else {
