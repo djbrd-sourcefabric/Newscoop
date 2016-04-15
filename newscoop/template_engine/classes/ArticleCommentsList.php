@@ -63,11 +63,12 @@ class ArticleCommentsList extends ListObject
         if ($this->_nested) {
             $nodeTree = new \Newscoop\GimmeBundle\Node\NodeTree();
             $nodeTree->build($articleCommentsList);
-            $metaCommentsList = $nodeTree->getFlattened();
-        } else {
-            foreach ($articleCommentsList as $comment) {
-                $metaCommentsList[] = new MetaComment($comment->getId());
-            }
+            $articleCommentsList = $nodeTree->getFlattened();
+
+        }
+
+        foreach ($articleCommentsList as $comment) {
+            $metaCommentsList[] = new MetaComment($comment->getId());
         }
 
 	    return $metaCommentsList;
