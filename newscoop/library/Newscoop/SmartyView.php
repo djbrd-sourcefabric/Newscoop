@@ -11,30 +11,32 @@ namespace Newscoop;
  */
 class SmartyView extends \Zend_View_Abstract
 {
-    /** @var Smarty */
-    protected $smarty;
-
-    /**
-     */
-    public function __construct()
-    {
-        $this->smarty = \CampTemplate::singleton();
-    }
-
     /**
      * Render template
      */
     public function _run()
     {
-        foreach ($this->getVars() as $key => $val) {
-            $this->smarty->assign($key, $val);
+        $container = \Zend_Registry::get('container');
+        $templatesService = $container->getService('newscoop.templates.service');
+        $request = $container->getService('request');
+        $language = $container->get('em')->getRepository('Newscoop\Entity\Language')->findOneByCode($request->getLocale());
+
+        $params = $this->getVars();
+        $params['view'] = $this;
+
+        $paramsForVector = json_encode(array('request' => \Zend_Controller_Front::getInstance()->getRequest()->getParams()));
+        if (strlen($paramsForVector) > 128) {
+            $paramsForVector = md5($paramsForVector);
         }
 
-        $this->smarty->assign('view', $this);
-        $this->smarty->assign('gimme', $this->smarty->context());
+        $templatesService->setVector(array(
+            'publication' => $request->attributes->get('_newscoop_publication_metadata[alias][publication_id]', null, true),
+            'language' => $language->getId(),
+            'params' => $paramsForVector
+        ));
 
         $file = array_shift(func_get_args());
-        $this->smarty->display($file);
+        $templatesService->renderTemplate($file, $params);
     }
 
     /**
@@ -44,6 +46,7 @@ class SmartyView extends \Zend_View_Abstract
      */
     public function addPath($path)
     {
-        $this->smarty->addTemplateDir($path);
+        $templatesService = \Zend_Registry::get('container')->getService('newscoop.templates.service');
+        $templatesService->getSmarty()->addTemplateDir($path);
     }
 }
